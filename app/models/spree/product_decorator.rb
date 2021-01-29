@@ -40,8 +40,10 @@ module Spree
     end
 
     def google_merchant_quantity
-        variants.map{|v| v.stock_items.reduce(0){|sum, item|sum + item.count_on_hand}}.inject(0){|sum,x| sum + x }
-
+      # Sums nb. of items in stock (count_on_hand) at every location for every
+      # variant (including master). If any variant doesn't track inventory,
+      # Float::INFINITY is returned
+      total_on_hand
     end
 
     def google_merchant_image_link
