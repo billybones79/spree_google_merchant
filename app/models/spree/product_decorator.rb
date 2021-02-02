@@ -34,14 +34,20 @@ module Spree
       'new'
     end
 
-    # <g:availability> in stock | available for order | out of stock | preorder
+    # <g:availability> in stock | out of stock | preorder
+    # Reference: support.google.com/merchants/answer/6324448
     def google_merchant_availability
-      google_merchant_quantity > 0 ? 'in stock' : 'out of stock'
+      quantity = google_merchant_quantity
+      # A non-tracked item or an item picked up in store must be "out of stock".
+      # Fixnum#infinite? doesn't exist, so convert to Float.
+      (quantity > 0) && !(quantity.to_f.infinite?) ? 'in stock' : 'out of stock'
     end
 
     def google_merchant_quantity
-        variants.map{|v| v.stock_items.reduce(0){|sum, item|sum + item.count_on_hand}}.inject(0){|sum,x| sum + x }
-
+      # Sums nb. of items in stock (count_on_hand) at every location for every
+      # variant including master. Returns Float::INFINITY if any variant
+      # doesn't track inventory (mostly because it's only available in store).
+      total_on_hand
     end
 
     def google_merchant_image_link

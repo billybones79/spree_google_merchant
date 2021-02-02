@@ -37,9 +37,13 @@ Spree::Variant.class_eval do
     'new'
   end
 
-  # <g:availability> in stock | available for order | out of stock | preorder
+  # <g:availability> in stock | out of stock | preorder
+  # Reference: support.google.com/merchants/answer/6324448
   def google_merchant_availability
-    product.google_merchant_quantity > 0 ? 'in stock' : 'out of stock'
+    quantity = product.google_merchant_quantity
+    # A non-tracked item or an item picked up in store must be "out of stock".
+    # Fixnum#infinite? doesn't exist, so convert to Float.
+    (quantity > 0) && !(quantity.to_f.infinite?) ? 'in stock' : 'out of stock'
   end
 
   def google_merchant_quantity
