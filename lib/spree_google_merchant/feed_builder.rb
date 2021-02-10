@@ -96,9 +96,12 @@ module SpreeGoogleMerchant
     end
     def upload_to_aws
       require 'aws-sdk'
-      s3 = Aws::S3::Resource.new(region:Spree::GoogleMerchant::Config[:s3_region])
+      byebug
+      s3 = Aws::S3::Resource.new(region:Spree::GoogleMerchant::Config[:s3_region],
+                                 access_key_id:  ENV["AWS_ACCESS_KEY_ID"],
+                                 secret_access_key: ENV["AWS_SECRET_ACCESS_KEY"])
       obj = s3.bucket(Spree::GoogleMerchant::Config[:s3_bucket]).object(filename)
-      obj.upload_file(path, acl: "public-read")
+      obj.upload_file(path)
 
       Spree::LastReport.create(url: obj.public_url)
 
