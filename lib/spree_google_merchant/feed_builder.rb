@@ -96,7 +96,7 @@ module SpreeGoogleMerchant
     end
     def upload_to_aws
       require 'aws-sdk'
-      byebug
+
       s3 = Aws::S3::Resource.new(region:Spree::GoogleMerchant::Config[:s3_region],
                                  access_key_id:  ENV["AWS_ACCESS_KEY_ID"],
                                  secret_access_key: ENV["AWS_SECRET_ACCESS_KEY"])
